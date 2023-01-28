@@ -1,48 +1,27 @@
 package com.example.jetpackcomposecourse.ui.theme
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposecourse.R
-import kotlinx.coroutines.launch
+import com.example.jetpackcomposecourse.domain.FeedPost
+import com.example.jetpackcomposecourse.ui.VkNewsViewModel
 
 @Composable
-fun MainScreen() {
-
-    val snackBarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val fabVisible = remember { mutableStateOf(true) }
+fun MainScreen(viewModel: VkNewsViewModel) {
 
     Scaffold(
-
-        snackbarHost = {
-            SnackbarHost(hostState = snackBarHostState)
-        },
-
-        floatingActionButton = {
-            if (fabVisible.value) {
-                FloatingActionButton(onClick = {
-                    scope.launch {
-                        val action = snackBarHostState.showSnackbar(message = "Show snackBar", actionLabel = "Скрыть FAB", duration = SnackbarDuration.Long)
-                        if (action == SnackbarResult.ActionPerformed) {
-                            fabVisible.value = false
-                        }
-                    }
-                })
-                {
-                    Icon(Icons.Filled.Favorite, contentDescription = null)
-                }
-            }
-        },
 
         bottomBar = {
             BottomNavigation() {
@@ -76,7 +55,15 @@ fun MainScreen() {
 
     )
     {
-
+        val feedPost = viewModel.feedPost.observeAsState(FeedPost())
+        PostCard(
+            modifier = Modifier.padding(8.dp),
+            feedPost = feedPost.value,
+            onViewsItemClickListener = viewModel::updateCount,
+            onShareItemClickListener = viewModel::updateCount,
+            onCommentItemClickListener = viewModel::updateCount,
+            onLikeItemClickListener = viewModel::updateCount
+        )
     }
 }
 

@@ -1,6 +1,7 @@
 package com.example.jetpackcomposecourse.ui.theme
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Card
@@ -15,39 +16,56 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.jetpackcomposecourse.R
+import com.example.jetpackcomposecourse.domain.FeedPost
+import com.example.jetpackcomposecourse.domain.StatisticItem
+import com.example.jetpackcomposecourse.domain.StatisticType
 
 @Composable
-fun PostCard() {
-    Card {
+fun PostCard(
+    modifier: Modifier = Modifier,
+    feedPost: FeedPost,
+    onViewsItemClickListener: (StatisticItem) -> Unit,
+    onShareItemClickListener: (StatisticItem) -> Unit,
+    onCommentItemClickListener: (StatisticItem) -> Unit,
+    onLikeItemClickListener: (StatisticItem) -> Unit
+) {
+    Card(modifier = modifier) {
         Column(modifier = Modifier.padding(8.dp)) {
 
-            PostHeader()
+            PostHeader(feedPost)
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(text = stringResource(R.string.template_text))
+            Text(text = feedPost.contentText)
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Image(
-                painter = painterResource(id = R.drawable.post_content_image),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                painter = painterResource(id = feedPost.contentImageResId),
                 contentDescription = null,
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.FillWidth)
+                contentScale = ContentScale.FillWidth
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            StatisticBar()
+            StatisticBar(
+                statistics = feedPost.statistics,
+                onViewsItemClickListener = onViewsItemClickListener,
+                onShareItemClickListener = onShareItemClickListener,
+                onCommentItemClickListener = onCommentItemClickListener,
+                onLikeItemClickListener = onLikeItemClickListener
+            )
         }
     }
 }
 
 @Composable
-private fun PostHeader() {
+private fun PostHeader(feedPost: FeedPost) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -57,66 +75,104 @@ private fun PostHeader() {
             modifier = Modifier
                 .size(50.dp)
                 .clip(CircleShape),
-            painter = painterResource(id = R.drawable.post_comunity_thumbnail),
-            contentDescription = null)
+            painter = painterResource(id = feedPost.avatarResId),
+            contentDescription = null
+        )
 
         Spacer(modifier = Modifier.width(8.dp))
 
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(text = "/dev/null", color = MaterialTheme.colors.onPrimary)
+            Text(text = feedPost.groupName, color = MaterialTheme.colors.onPrimary)
             Spacer(modifier = Modifier.width(4.dp))
-            Text(text = "14:00", color = MaterialTheme.colors.onSecondary)
+            Text(text = feedPost.postDate, color = MaterialTheme.colors.onSecondary)
         }
 
-        Icon(imageVector = Icons.Rounded.MoreVert, contentDescription = null, tint = MaterialTheme.colors.onSecondary)
+        Icon(
+            imageVector = Icons.Rounded.MoreVert,
+            contentDescription = null,
+            tint = MaterialTheme.colors.onSecondary
+        )
     }
 }
 
-@Preview
 @Composable
-private fun StatisticBar() {
+private fun StatisticBar(
+    statistics: List<StatisticItem>,
+    onViewsItemClickListener: (StatisticItem) -> Unit,
+    onShareItemClickListener: (StatisticItem) -> Unit,
+    onCommentItemClickListener: (StatisticItem) -> Unit,
+    onLikeItemClickListener: (StatisticItem) -> Unit
+) {
     Row() {
         Row(modifier = Modifier.weight(1f))
         {
-            IconWithText(iconResId = R.drawable.ic_views_count, text = "966")
+            val viewsItem = statistics.getItemByType(type = StatisticType.VIEWS)
+            IconWithText(
+                iconResId = R.drawable.ic_views_count,
+                text = viewsItem.count.toString(),
+                onItemClickListener = {
+                    onViewsItemClickListener(viewsItem)
+                }
+            )
         }
         Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceBetween)
         {
-            IconWithText(iconResId = R.drawable.ic_share, text = "7")
-            IconWithText(iconResId = R.drawable.ic_comment, text = "8")
-            IconWithText(iconResId = R.drawable.ic_like, text = "27")
+            val sharesItem = statistics.getItemByType(type = StatisticType.SHARES)
+            IconWithText(
+                iconResId = R.drawable.ic_share,
+                text = sharesItem.count.toString(),
+                onItemClickListener = {
+                    onShareItemClickListener(sharesItem)
+                }
+            )
+            val commentsItem = statistics.getItemByType(type = StatisticType.COMMENTS)
+            IconWithText(
+                iconResId = R.drawable.ic_comment,
+                text = commentsItem.count.toString(),
+                onItemClickListener = {
+                    onCommentItemClickListener(commentsItem)
+                }
+            )
+            val likeItem = statistics.getItemByType(type = StatisticType.LIKES)
+            IconWithText(
+                iconResId = R.drawable.ic_like,
+                text = likeItem.count.toString(),
+                onItemClickListener = {
+                    onLikeItemClickListener(likeItem)
+                }
+            )
         }
     }
+}
+
+private fun List<StatisticItem>.getItemByType(type: StatisticType): StatisticItem {
+    return this.find {
+        it.type == type
+    } ?: throw IllegalStateException()
 }
 
 @Composable
 private fun IconWithText(
     iconResId: Int,
-    text: String
+    text: String,
+    onItemClickListener: () -> Unit
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(painter = painterResource(id = iconResId), contentDescription = null, tint = MaterialTheme.colors.onSecondary)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clickable {
+            onItemClickListener()
+        }
+    ) {
+        Icon(
+            painter = painterResource(id = iconResId),
+            contentDescription = null,
+            tint = MaterialTheme.colors.onSecondary
+        )
 
         Spacer(modifier = Modifier.width(4.dp))
 
         Text(text = text, color = MaterialTheme.colors.onSecondary)
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewLight() {
-    JetpackComposeCourseTheme(darkTheme = false) {
-        PostCard()
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewDark() {
-    JetpackComposeCourseTheme(darkTheme = true) {
-        PostCard()
     }
 }
