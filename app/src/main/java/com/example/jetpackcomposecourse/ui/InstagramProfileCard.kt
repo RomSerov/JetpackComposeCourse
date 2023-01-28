@@ -6,11 +6,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,15 +17,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackcomposecourse.R
-import com.example.jetpackcomposecourse.ui.theme.JetpackComposeCourseTheme
 
 
 @Composable
-fun InstagramProfileCard() {
+fun InstagramProfileCard(viewModel: InstagramViewModel) {
+
+    /* кнопка подписаться */
+    val isFollowedBtn = viewModel.isFollowing.observeAsState(false)
+
     Card(
         modifier = Modifier.padding(8.dp),
         backgroundColor = MaterialTheme.colors.background,
@@ -56,10 +57,34 @@ fun InstagramProfileCard() {
             Text(text = "Instagram", fontSize = 32.sp, fontFamily = FontFamily.Cursive)
             Text(text = "YoursToMake", fontSize = 14.sp)
             Text(text = "www.facebook.com/dagestan", fontSize = 14.sp)
-            Button(onClick = {  }) {
-                Text(text = "Follow")
+            FollowButton(isFollowedBtn = isFollowedBtn) {
+                viewModel.changeFollowingStatus()
             }
         }
+    }
+}
+
+@Composable
+private fun FollowButton(
+    isFollowedBtn: State<Boolean>,
+    clickFollow: () -> Unit
+) {
+    Button(
+        onClick = { clickFollow() },
+        colors = ButtonDefaults.buttonColors(
+            if (isFollowedBtn.value) {
+                MaterialTheme.colors.primary.copy(alpha = 0.5f)
+            } else {
+                MaterialTheme.colors.primary
+            }
+        )
+    ) {
+        val textBtn = if (isFollowedBtn.value) {
+            "Отписаться"
+        } else {
+            "Подписаться"
+        }
+        Text(text = textBtn)
     }
 }
 
@@ -72,7 +97,7 @@ private fun UserStatistic(
         modifier = Modifier.height(80.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly
-        )
+    )
     {
         Text(
             text = value,
@@ -83,21 +108,5 @@ private fun UserStatistic(
             text = title,
             fontWeight = FontWeight.Bold
         )
-    }
-}
-
-@Preview
-@Composable
-fun PreviewCardLight() {
-    JetpackComposeCourseTheme(darkTheme = false) {
-        InstagramProfileCard()
-    }
-}
-
-@Preview
-@Composable
-fun PreviewCardDark() {
-    JetpackComposeCourseTheme(darkTheme = true) {
-        InstagramProfileCard()
     }
 }
