@@ -8,8 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,11 +21,10 @@ import com.example.jetpackcomposecourse.R
 
 
 @Composable
-fun InstagramProfileCard(viewModel: InstagramViewModel) {
-
-    /* кнопка подписаться */
-    val isFollowedBtn = viewModel.isFollowing.observeAsState(false)
-
+fun InstagramProfileCard(
+    model: InstagramModel,
+    onFollowedBtnClickListener: (InstagramModel) -> Unit
+) {
     Card(
         modifier = Modifier.padding(8.dp),
         backgroundColor = MaterialTheme.colors.background,
@@ -54,11 +51,11 @@ fun InstagramProfileCard(viewModel: InstagramViewModel) {
                 UserStatistic(title = "Followers", value = "436")
                 UserStatistic(title = "Following", value = "59")
             }
-            Text(text = "Instagram", fontSize = 32.sp, fontFamily = FontFamily.Cursive)
-            Text(text = "YoursToMake", fontSize = 14.sp)
+            Text(text = "Instagram ${model.id}", fontSize = 32.sp, fontFamily = FontFamily.Cursive)
+            Text(text = "#${model.title}", fontSize = 14.sp)
             Text(text = "www.facebook.com/dagestan", fontSize = 14.sp)
-            FollowButton(isFollowedBtn = isFollowedBtn) {
-                viewModel.changeFollowingStatus()
+            FollowButton(isFollowedBtn = model.isFollowed) {
+                onFollowedBtnClickListener(model)
             }
         }
     }
@@ -66,20 +63,20 @@ fun InstagramProfileCard(viewModel: InstagramViewModel) {
 
 @Composable
 private fun FollowButton(
-    isFollowedBtn: State<Boolean>,
+    isFollowedBtn: Boolean,
     clickFollow: () -> Unit
 ) {
     Button(
         onClick = { clickFollow() },
         colors = ButtonDefaults.buttonColors(
-            if (isFollowedBtn.value) {
+            if (isFollowedBtn) {
                 MaterialTheme.colors.primary.copy(alpha = 0.5f)
             } else {
                 MaterialTheme.colors.primary
             }
         )
     ) {
-        val textBtn = if (isFollowedBtn.value) {
+        val textBtn = if (isFollowedBtn) {
             "Отписаться"
         } else {
             "Подписаться"
