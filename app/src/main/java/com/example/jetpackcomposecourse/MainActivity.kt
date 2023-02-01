@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import com.example.jetpackcomposecourse.ui.VkNewsViewModel
+import com.example.jetpackcomposecourse.ui.screens.home.VkNewsViewModel
 import com.example.jetpackcomposecourse.ui.theme.JetpackComposeCourseTheme
 import com.example.jetpackcomposecourse.ui.theme.MainScreen
 

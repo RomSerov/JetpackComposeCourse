@@ -26,22 +26,21 @@ import com.example.jetpackcomposecourse.domain.StatisticType
 fun PostCard(
     modifier: Modifier = Modifier,
     feedPost: FeedPost,
-    onViewsItemClickListener: (StatisticItem) -> Unit,
-    onShareItemClickListener: (StatisticItem) -> Unit,
-    onCommentItemClickListener: (StatisticItem) -> Unit,
-    onLikeItemClickListener: (StatisticItem) -> Unit
+    onLikeClickListener: (StatisticItem) -> Unit,
+    onShareClickListener: (StatisticItem) -> Unit,
+    onViewsClickListener: (StatisticItem) -> Unit,
+    onCommentClickListener: (StatisticItem) -> Unit,
 ) {
-    Card(modifier = modifier) {
-        Column(modifier = Modifier.padding(8.dp)) {
-
+    Card(
+        modifier = modifier
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+        ) {
             PostHeader(feedPost)
-
             Spacer(modifier = Modifier.height(8.dp))
-
             Text(text = feedPost.contentText)
-
             Spacer(modifier = Modifier.height(8.dp))
-
             Image(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -50,27 +49,26 @@ fun PostCard(
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth
             )
-
             Spacer(modifier = Modifier.height(8.dp))
-
-            StatisticBar(
+            Statistics(
                 statistics = feedPost.statistics,
-                onViewsItemClickListener = onViewsItemClickListener,
-                onShareItemClickListener = onShareItemClickListener,
-                onCommentItemClickListener = onCommentItemClickListener,
-                onLikeItemClickListener = onLikeItemClickListener
+                onLikeClickListener = onLikeClickListener,
+                onCommentClickListener = onCommentClickListener,
+                onShareClickListener = onShareClickListener,
+                onViewsClickListener = onViewsClickListener
             )
         }
     }
 }
 
 @Composable
-private fun PostHeader(feedPost: FeedPost) {
+private fun PostHeader(
+    feedPost: FeedPost
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Image(
             modifier = Modifier
                 .size(50.dp)
@@ -78,17 +76,20 @@ private fun PostHeader(feedPost: FeedPost) {
             painter = painterResource(id = feedPost.avatarResId),
             contentDescription = null
         )
-
         Spacer(modifier = Modifier.width(8.dp))
-
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(text = feedPost.groupName, color = MaterialTheme.colors.onPrimary)
+            Text(
+                text = feedPost.communityName,
+                color = MaterialTheme.colors.onPrimary
+            )
             Spacer(modifier = Modifier.width(4.dp))
-            Text(text = feedPost.postDate, color = MaterialTheme.colors.onSecondary)
+            Text(
+                text = feedPost.publicationDate,
+                color = MaterialTheme.colors.onSecondary
+            )
         }
-
         Icon(
             imageVector = Icons.Rounded.MoreVert,
             contentDescription = null,
@@ -98,49 +99,52 @@ private fun PostHeader(feedPost: FeedPost) {
 }
 
 @Composable
-private fun StatisticBar(
+private fun Statistics(
     statistics: List<StatisticItem>,
-    onViewsItemClickListener: (StatisticItem) -> Unit,
-    onShareItemClickListener: (StatisticItem) -> Unit,
-    onCommentItemClickListener: (StatisticItem) -> Unit,
-    onLikeItemClickListener: (StatisticItem) -> Unit
+    onLikeClickListener: (StatisticItem) -> Unit,
+    onShareClickListener: (StatisticItem) -> Unit,
+    onViewsClickListener: (StatisticItem) -> Unit,
+    onCommentClickListener: (StatisticItem) -> Unit,
 ) {
-    Row() {
-        Row(modifier = Modifier.weight(1f))
-        {
-            val viewsItem = statistics.getItemByType(type = StatisticType.VIEWS)
+    Row {
+        Row(
+            modifier = Modifier.weight(1f)
+        ) {
+            val viewsItem = statistics.getItemByType(StatisticType.VIEWS)
             IconWithText(
                 iconResId = R.drawable.ic_views_count,
                 text = viewsItem.count.toString(),
                 onItemClickListener = {
-                    onViewsItemClickListener(viewsItem)
+                    onViewsClickListener(viewsItem)
                 }
             )
         }
-        Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.SpaceBetween)
-        {
-            val sharesItem = statistics.getItemByType(type = StatisticType.SHARES)
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            val sharesItem = statistics.getItemByType(StatisticType.SHARES)
             IconWithText(
                 iconResId = R.drawable.ic_share,
                 text = sharesItem.count.toString(),
                 onItemClickListener = {
-                    onShareItemClickListener(sharesItem)
+                    onShareClickListener(sharesItem)
                 }
             )
-            val commentsItem = statistics.getItemByType(type = StatisticType.COMMENTS)
+            val commentItem = statistics.getItemByType(StatisticType.COMMENTS)
             IconWithText(
                 iconResId = R.drawable.ic_comment,
-                text = commentsItem.count.toString(),
+                text = commentItem.count.toString(),
                 onItemClickListener = {
-                    onCommentItemClickListener(commentsItem)
+                    onCommentClickListener(commentItem)
                 }
             )
-            val likeItem = statistics.getItemByType(type = StatisticType.LIKES)
+            val likesItem = statistics.getItemByType(StatisticType.LIKES)
             IconWithText(
                 iconResId = R.drawable.ic_like,
-                text = likeItem.count.toString(),
+                text = likesItem.count.toString(),
                 onItemClickListener = {
-                    onLikeItemClickListener(likeItem)
+                    onLikeClickListener(likesItem)
                 }
             )
         }
@@ -148,9 +152,7 @@ private fun StatisticBar(
 }
 
 private fun List<StatisticItem>.getItemByType(type: StatisticType): StatisticItem {
-    return this.find {
-        it.type == type
-    } ?: throw IllegalStateException()
+    return this.find { it.type == type } ?: throw IllegalStateException()
 }
 
 @Composable
@@ -160,19 +162,20 @@ private fun IconWithText(
     onItemClickListener: () -> Unit
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clickable {
             onItemClickListener()
-        }
+        },
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             painter = painterResource(id = iconResId),
             contentDescription = null,
             tint = MaterialTheme.colors.onSecondary
         )
-
         Spacer(modifier = Modifier.width(4.dp))
-
-        Text(text = text, color = MaterialTheme.colors.onSecondary)
+        Text(
+            text = text,
+            color = MaterialTheme.colors.onSecondary
+        )
     }
 }
