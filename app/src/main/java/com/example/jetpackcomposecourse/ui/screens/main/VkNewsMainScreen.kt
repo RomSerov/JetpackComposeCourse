@@ -2,25 +2,26 @@ package com.example.jetpackcomposecourse.ui.theme
 
 import androidx.compose.foundation.clickable
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.jetpackcomposecourse.ui.screens.home.VkNewsViewModel
+import com.example.jetpackcomposecourse.domain.FeedPost
 import com.example.jetpackcomposecourse.ui.navigation.AppNavGraph
 import com.example.jetpackcomposecourse.ui.navigation.rememberNavigationState
+import com.example.jetpackcomposecourse.ui.screens.CommentsScreen
 import com.example.jetpackcomposecourse.ui.screens.HomeScreen
 import com.example.jetpackcomposecourse.ui.screens.main.NavigationItem
 
 @Composable
-fun MainScreen(viewModel: VkNewsViewModel) {
+fun MainScreen() {
 
     val navigationState = rememberNavigationState()
+    val commentsToPost: MutableState<FeedPost?> = remember {
+        mutableStateOf(null)
+    }
 
     Scaffold(
         bottomBar = {
@@ -54,7 +55,18 @@ fun MainScreen(viewModel: VkNewsViewModel) {
         AppNavGraph(
             navHostController = navigationState.navHostController,
             homeScreenContent = {
-                HomeScreen(viewModel = viewModel, paddingValues = paddingValues)
+                if (commentsToPost.value == null) {
+                    HomeScreen(
+                        paddingValues = paddingValues,
+                        onCommentClickListener = {
+                            commentsToPost.value = it
+                        }
+                    )
+                } else {
+                    CommentsScreen {
+                        commentsToPost.value = null
+                    }
+                }
             },
             favoriteScreenContent = {
                 TextCounter(name = "Favourite")

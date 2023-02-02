@@ -1,0 +1,29 @@
+package com.example.jetpackcomposecourse.ui.screens.comment
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.example.jetpackcomposecourse.domain.FeedPost
+import com.example.jetpackcomposecourse.domain.PostComment
+
+class CommentsViewModel: ViewModel()  {
+
+    private val _screenState = MutableLiveData<CommentsScreenState>(CommentsScreenState.Initial)
+    val screenState: LiveData<CommentsScreenState > = _screenState
+
+    init {
+        loadComments(FeedPost())
+    }
+
+    fun loadComments(feedPost: FeedPost) {
+        val fakeComments = mutableListOf<PostComment>().apply {
+            repeat(10) {
+                add(PostComment(id = it))
+            }
+        }
+        _screenState.value = CommentsScreenState.Comments(
+            comments = fakeComments,
+            feedPost = feedPost
+        )
+    }
+}
