@@ -18,7 +18,8 @@ import com.example.jetpackcomposecourse.domain.PostComment
 @Composable
 fun CommentsScreen(
     feedPost: FeedPost,
-    comments: List<PostComment>
+    comments: List<PostComment>,
+    onBackPressed: () -> Unit
     ) {
 
     Scaffold(
@@ -28,7 +29,7 @@ fun CommentsScreen(
                     Text(text = "Comments for FeedPost Id: ${feedPost.id}")
                 },
                 navigationIcon = {
-                    IconButton(onClick = {  }) {
+                    IconButton(onClick = { onBackPressed() }) {
                         Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = null)
                     }
                 }

@@ -1,5 +1,6 @@
 package com.example.jetpackcomposecourse.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,7 +31,16 @@ fun HomeScreen(
             FeedPosts(viewModel = viewModel, paddingValues = paddingValues, posts = currentState.posts)
         }
         is HomeScreenState.Comments -> {
-            CommentsScreen(feedPost = currentState.feedPost, comments = currentState.comments)
+            CommentsScreen(
+                feedPost = currentState.feedPost,
+                comments = currentState.comments,
+                onBackPressed = {
+                    viewModel.closeComment()
+                }
+            )
+            BackHandler() {
+                viewModel.closeComment()
+            }
         }
         is HomeScreenState.Initial -> Unit
     }
@@ -74,8 +84,8 @@ private fun FeedPosts(
                     onShareClickListener = { statisticItem ->
                         viewModel.updateCount(feedPost, statisticItem)
                     },
-                    onCommentClickListener = { statisticItem ->
-                        viewModel.updateCount(feedPost, statisticItem)
+                    onCommentClickListener = {
+                        viewModel.showComments(feedPost = feedPost)
                     },
                     onLikeClickListener = { statisticItem ->
                         viewModel.updateCount(feedPost, statisticItem)
