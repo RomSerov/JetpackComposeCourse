@@ -14,14 +14,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.jetpackcomposecourse.domain.FeedPost
 import com.example.jetpackcomposecourse.domain.PostComment
 import com.example.jetpackcomposecourse.ui.screens.comment.CommentsScreenState
 import com.example.jetpackcomposecourse.ui.screens.comment.CommentsViewModel
+import com.example.jetpackcomposecourse.ui.screens.comment.CommentsViewModelFactory
 
 @Composable
-fun CommentsScreen(onBackPressed: () -> Unit ) {
+fun CommentsScreen(onBackPressed: () -> Unit, feedPost: FeedPost) {
 
-    val viewModel: CommentsViewModel = viewModel()
+    val viewModel: CommentsViewModel = viewModel(factory = CommentsViewModelFactory(feedPost = feedPost))
+
     val screenState = viewModel.screenState.observeAsState(CommentsScreenState.Initial)
 
     val currentState = screenState.value

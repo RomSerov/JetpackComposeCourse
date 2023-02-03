@@ -1,4 +1,4 @@
-package com.example.jetpackcomposecourse.ui.theme
+package com.example.jetpackcomposecourse.ui.screens.main
 
 import androidx.compose.foundation.clickable
 import androidx.compose.material.*
@@ -7,28 +7,25 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.jetpackcomposecourse.domain.FeedPost
 import com.example.jetpackcomposecourse.ui.navigation.AppNavGraph
+import com.example.jetpackcomposecourse.ui.navigation.Screen
 import com.example.jetpackcomposecourse.ui.navigation.rememberNavigationState
 import com.example.jetpackcomposecourse.ui.screens.CommentsScreen
 import com.example.jetpackcomposecourse.ui.screens.HomeScreen
-import com.example.jetpackcomposecourse.ui.screens.main.NavigationItem
 
 @Composable
 fun MainScreen() {
 
     val navigationState = rememberNavigationState()
-    val commentsToPost: MutableState<FeedPost?> = remember {
-        mutableStateOf(null)
-    }
 
     Scaffold(
         bottomBar = {
             BottomNavigation {
                 //стэйт для текущего открытого экрана
                 val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
 
                 val items = listOf(
                     NavigationItem.Home,
@@ -36,9 +33,18 @@ fun MainScreen() {
                     NavigationItem.Profile
                 )
                 items.forEach { item ->
+
+                    /* Если находимся на экране коментов или постов, для любого (any) вернуть true */
+                    val selected = navBackStackEntry?.destination?.hierarchy?.any {
+                        it.route == item.screen.route
+                    } ?: false
+
                     BottomNavigationItem(
-                        selected = currentRoute == item.screen.route,
-                        onClick = { navigationState.navigate(item.screen.route) },
+                        selected = selected,
+                        /* при клике на нижний таб нужно игнорировать еще раз вызов */
+                        onClick = { if (!selected) {
+                            navigationState.navigate(item.screen.route)
+                        } },
                         icon = {
                             Icon(item.icon, contentDescription = null)
                         },
@@ -54,19 +60,19 @@ fun MainScreen() {
     ) { paddingValues ->
         AppNavGraph(
             navHostController = navigationState.navHostController,
-            homeScreenContent = {
-                if (commentsToPost.value == null) {
+            newsFeedScreenContent = {
                     HomeScreen(
                         paddingValues = paddingValues,
                         onCommentClickListener = {
-                            commentsToPost.value = it
+                            navigationState.navigateToComments(it)
                         }
                     )
-                } else {
-                    CommentsScreen {
-                        commentsToPost.value = null
-                    }
-                }
+
+            },
+            commentsScreenContent = { feedPost ->
+                CommentsScreen(
+                    feedPost = feedPost,
+                    onBackPressed = { navigationState.navHostController.popBackStack() })
             },
             favoriteScreenContent = {
                 TextCounter(name = "Favourite")
