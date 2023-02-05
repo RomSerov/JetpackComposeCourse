@@ -1,4 +1,4 @@
-package com.example.jetpackcomposecourse.ui.navigation
+package com.example.jetpackcomposecourse.navigation
 
 import android.net.Uri
 import com.example.jetpackcomposecourse.domain.FeedPost

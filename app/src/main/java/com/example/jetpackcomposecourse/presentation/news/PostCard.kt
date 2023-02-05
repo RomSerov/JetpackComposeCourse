@@ -1,4 +1,4 @@
-package com.example.jetpackcomposecourse.ui.theme
+package com.example.jetpackcomposecourse.presentation.news
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.jetpackcomposecourse.R
 import com.example.jetpackcomposecourse.domain.FeedPost
 import com.example.jetpackcomposecourse.domain.StatisticItem
@@ -38,18 +39,24 @@ fun PostCard(
             modifier = Modifier.padding(8.dp)
         ) {
             PostHeader(feedPost)
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(text = feedPost.contentText)
+
             Spacer(modifier = Modifier.height(8.dp))
-            Image(
+
+            AsyncImage(
+                model = feedPost.contentImageUrl,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
-                painter = painterResource(id = feedPost.contentImageResId),
+                    .wrapContentHeight(),
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth
             )
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Statistics(
                 statistics = feedPost.statistics,
                 onLikeClickListener = onLikeClickListener,
@@ -69,14 +76,16 @@ private fun PostHeader(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Image(
+        AsyncImage(
+            model = feedPost.communityImageUrl,
             modifier = Modifier
                 .size(50.dp)
                 .clip(CircleShape),
-            painter = painterResource(id = feedPost.avatarResId),
             contentDescription = null
         )
+
         Spacer(modifier = Modifier.width(8.dp))
+
         Column(
             modifier = Modifier.weight(1f)
         ) {
@@ -84,12 +93,15 @@ private fun PostHeader(
                 text = feedPost.communityName,
                 color = MaterialTheme.colors.onPrimary
             )
+
             Spacer(modifier = Modifier.width(4.dp))
+
             Text(
                 text = feedPost.publicationDate,
                 color = MaterialTheme.colors.onSecondary
             )
         }
+
         Icon(
             imageVector = Icons.Rounded.MoreVert,
             contentDescription = null,
@@ -119,11 +131,13 @@ private fun Statistics(
                 }
             )
         }
+
         Row(
             modifier = Modifier.weight(1f),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             val sharesItem = statistics.getItemByType(StatisticType.SHARES)
+
             IconWithText(
                 iconResId = R.drawable.ic_share,
                 text = sharesItem.count.toString(),
@@ -132,6 +146,7 @@ private fun Statistics(
                 }
             )
             val commentItem = statistics.getItemByType(StatisticType.COMMENTS)
+
             IconWithText(
                 iconResId = R.drawable.ic_comment,
                 text = commentItem.count.toString(),
@@ -140,6 +155,7 @@ private fun Statistics(
                 }
             )
             val likesItem = statistics.getItemByType(StatisticType.LIKES)
+
             IconWithText(
                 iconResId = R.drawable.ic_like,
                 text = likesItem.count.toString(),
@@ -167,12 +183,15 @@ private fun IconWithText(
         },
         verticalAlignment = Alignment.CenterVertically
     ) {
+
         Icon(
             painter = painterResource(id = iconResId),
             contentDescription = null,
             tint = MaterialTheme.colors.onSecondary
         )
+
         Spacer(modifier = Modifier.width(4.dp))
+
         Text(
             text = text,
             color = MaterialTheme.colors.onSecondary

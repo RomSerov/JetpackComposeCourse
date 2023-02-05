@@ -1,27 +1,40 @@
-package com.example.jetpackcomposecourse.ui.screens.home
+package com.example.jetpackcomposecourse.presentation.news
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.jetpackcomposecourse.data.mapper.NewsFeedMapper
+import com.example.jetpackcomposecourse.data.network.ApiFactory
 import com.example.jetpackcomposecourse.domain.FeedPost
 import com.example.jetpackcomposecourse.domain.StatisticItem
-import com.example.jetpackcomposecourse.ui.screens.main.NavigationItem
+import com.vk.api.sdk.VKPreferencesKeyValueStorage
+import com.vk.api.sdk.auth.VKAccessToken
+import kotlinx.coroutines.launch
 
-class NewsFeedViewModel: ViewModel() {
+class NewsFeedViewModel(application: Application): AndroidViewModel(application) {
 
-    private val sourceList = mutableListOf<FeedPost>().apply {
-        repeat(10) {
-            add(FeedPost(id = it))
-        }
-    }
-
-    private val initialState = NewsFeedScreenState.Posts(posts = sourceList)
+    private val initialState = NewsFeedScreenState.Initial
 
     private val _screenState = MutableLiveData<NewsFeedScreenState>(initialState)
     val screenState: LiveData<NewsFeedScreenState> = _screenState
 
-    private val _selectedNavItem = MutableLiveData<NavigationItem>(NavigationItem.Home)
-    val selectedNavItem: LiveData<NavigationItem> = _selectedNavItem
+    private val mapper = NewsFeedMapper()
+
+    init {
+        loadRecommendations()
+    }
+
+    private fun loadRecommendations() {
+        viewModelScope.launch {
+            val storage = VKPreferencesKeyValueStorage(context = getApplication())
+            val token = VKAccessToken.restore(keyValueStorage = storage) ?: return@launch
+            val response = ApiFactory.apiService.loadRecommendation(token = token.accessToken)
+            val feedPosts = mapper.mapResponseDtoToPostsEntity(responseDto = response)
+            _screenState.value = NewsFeedScreenState.Posts(posts = feedPosts)
+        }
+    }
 
     fun updateCount(feedPost: FeedPost, item: StatisticItem) {
 

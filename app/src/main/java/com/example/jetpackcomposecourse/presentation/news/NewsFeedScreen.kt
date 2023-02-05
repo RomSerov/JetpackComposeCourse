@@ -1,4 +1,4 @@
-package com.example.jetpackcomposecourse.ui.screens
+package com.example.jetpackcomposecourse.presentation.news
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
@@ -16,12 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackcomposecourse.domain.FeedPost
-import com.example.jetpackcomposecourse.ui.screens.home.NewsFeedScreenState
-import com.example.jetpackcomposecourse.ui.screens.home.NewsFeedViewModel
-import com.example.jetpackcomposecourse.ui.theme.PostCard
 
 @Composable
-fun HomeScreen(
+fun NewsFeedScreen(
     paddingValues: PaddingValues,
     onCommentClickListener: (FeedPost) -> Unit
 ) {

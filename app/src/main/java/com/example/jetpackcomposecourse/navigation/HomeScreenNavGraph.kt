@@ -1,4 +1,4 @@
-package com.example.jetpackcomposecourse.ui.navigation
+package com.example.jetpackcomposecourse.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.jetpackcomposecourse.domain.FeedPost
-import com.example.jetpackcomposecourse.ui.navigation.Screen.Companion.KEY_FEED_POST
+import com.example.jetpackcomposecourse.navigation.Screen.Companion.KEY_FEED_POST
 import com.google.gson.Gson
 
 fun NavGraphBuilder.homeScreenNavGraph(

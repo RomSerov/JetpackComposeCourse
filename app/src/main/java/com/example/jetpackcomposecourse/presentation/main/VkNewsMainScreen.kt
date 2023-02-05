@@ -1,4 +1,4 @@
-package com.example.jetpackcomposecourse.ui.screens.main
+package com.example.jetpackcomposecourse.presentation.main
 
 import androidx.compose.foundation.clickable
 import androidx.compose.material.*
@@ -9,12 +9,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.jetpackcomposecourse.domain.FeedPost
-import com.example.jetpackcomposecourse.ui.navigation.AppNavGraph
-import com.example.jetpackcomposecourse.ui.navigation.Screen
-import com.example.jetpackcomposecourse.ui.navigation.rememberNavigationState
-import com.example.jetpackcomposecourse.ui.screens.CommentsScreen
-import com.example.jetpackcomposecourse.ui.screens.HomeScreen
+import com.example.jetpackcomposecourse.navigation.AppNavGraph
+import com.example.jetpackcomposecourse.navigation.rememberNavigationState
+import com.example.jetpackcomposecourse.presentation.comments.CommentsScreen
+import com.example.jetpackcomposecourse.presentation.news.NewsFeedScreen
 
 @Composable
 fun MainScreen() {
@@ -61,7 +59,7 @@ fun MainScreen() {
         AppNavGraph(
             navHostController = navigationState.navHostController,
             newsFeedScreenContent = {
-                    HomeScreen(
+                    NewsFeedScreen(
                         paddingValues = paddingValues,
                         onCommentClickListener = {
                             navigationState.navigateToComments(it)

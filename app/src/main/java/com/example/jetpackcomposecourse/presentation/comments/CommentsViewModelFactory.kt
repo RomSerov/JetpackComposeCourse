@@ -1,4 +1,4 @@
-package com.example.jetpackcomposecourse.ui.screens.comment
+package com.example.jetpackcomposecourse.presentation.comments
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

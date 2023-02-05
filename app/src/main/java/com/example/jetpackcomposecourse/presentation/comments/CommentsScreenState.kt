@@ -1,4 +1,4 @@
-package com.example.jetpackcomposecourse.ui.screens.comment
+package com.example.jetpackcomposecourse.presentation.comments
 
 import com.example.jetpackcomposecourse.domain.FeedPost
 import com.example.jetpackcomposecourse.domain.PostComment

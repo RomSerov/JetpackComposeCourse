@@ -1,4 +1,4 @@
-package com.example.jetpackcomposecourse.ui.screens
+package com.example.jetpackcomposecourse.presentation.comments
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -16,9 +16,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackcomposecourse.domain.FeedPost
 import com.example.jetpackcomposecourse.domain.PostComment
-import com.example.jetpackcomposecourse.ui.screens.comment.CommentsScreenState
-import com.example.jetpackcomposecourse.ui.screens.comment.CommentsViewModel
-import com.example.jetpackcomposecourse.ui.screens.comment.CommentsViewModelFactory
 
 @Composable
 fun CommentsScreen(onBackPressed: () -> Unit, feedPost: FeedPost) {

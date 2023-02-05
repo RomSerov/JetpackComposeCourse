@@ -1,4 +1,4 @@
-package com.example.jetpackcomposecourse.ui.screens.home
+package com.example.jetpackcomposecourse.presentation.news
 
 import com.example.jetpackcomposecourse.domain.FeedPost
 
