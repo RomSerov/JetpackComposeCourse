@@ -5,72 +5,51 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.jetpackcomposecourse.data.mapper.NewsFeedMapper
-import com.example.jetpackcomposecourse.data.network.ApiFactory
+import com.example.jetpackcomposecourse.data.repository.NewsFeedRepository
 import com.example.jetpackcomposecourse.domain.FeedPost
 import com.example.jetpackcomposecourse.domain.StatisticItem
-import com.vk.api.sdk.VKPreferencesKeyValueStorage
-import com.vk.api.sdk.auth.VKAccessToken
 import kotlinx.coroutines.launch
 
-class NewsFeedViewModel(application: Application): AndroidViewModel(application) {
+class NewsFeedViewModel(application: Application) : AndroidViewModel(application) {
 
     private val initialState = NewsFeedScreenState.Initial
 
     private val _screenState = MutableLiveData<NewsFeedScreenState>(initialState)
     val screenState: LiveData<NewsFeedScreenState> = _screenState
 
-    private val mapper = NewsFeedMapper()
+    private val repository = NewsFeedRepository(application)
 
     init {
+        _screenState.value = NewsFeedScreenState.Loading
         loadRecommendations()
     }
 
     private fun loadRecommendations() {
         viewModelScope.launch {
-            val storage = VKPreferencesKeyValueStorage(context = getApplication())
-            val token = VKAccessToken.restore(keyValueStorage = storage) ?: return@launch
-            val response = ApiFactory.apiService.loadRecommendation(token = token.accessToken)
-            val feedPosts = mapper.mapResponseDtoToPostsEntity(responseDto = response)
+            val feedPosts = repository.loadRecommendations()
             _screenState.value = NewsFeedScreenState.Posts(posts = feedPosts)
         }
     }
 
-    fun updateCount(feedPost: FeedPost, item: StatisticItem) {
+    fun loadNextRecommendations() {
+        _screenState.value = NewsFeedScreenState.Posts(
+            posts = repository.feedPosts,
+            nextDataIsLoading = true
+        )
+        loadRecommendations()
+    }
 
-        val currentState = screenState.value
-        if (currentState !is NewsFeedScreenState.Posts) return
-
-        val oldPosts = currentState.posts.toMutableList()
-        val oldStatistics = feedPost.statistics
-        val newStatistics = oldStatistics.toMutableList().apply {
-            replaceAll { oldItem ->
-                if (oldItem.type == item.type) {
-                    oldItem.copy(count = oldItem.count + 1)
-                } else {
-                    oldItem
-                }
-            }
+    fun changeLikeStatus(feedPost: FeedPost) {
+        viewModelScope.launch {
+            repository.changeLikeStatus(feedPost)
+            _screenState.value = NewsFeedScreenState.Posts(posts = repository.feedPosts)
         }
-        val newFeedPost = feedPost.copy(statistics = newStatistics)
-        val newPost = oldPosts.apply {
-            replaceAll {
-                if (it.id == newFeedPost.id) {
-                    newFeedPost
-                } else {
-                    it
-                }
-            }
-        }
-        _screenState.value = NewsFeedScreenState.Posts(posts = newPost)
     }
 
     fun remove(feedPost: FeedPost) {
-        val currentState = screenState.value
-        if (currentState !is NewsFeedScreenState.Posts) return
-
-        val oldPosts = currentState.posts.toMutableList()
-        oldPosts.remove(feedPost)
-        _screenState.value = NewsFeedScreenState.Posts(posts = oldPosts)
+        viewModelScope.launch {
+            repository.deletePost(feedPost)
+            _screenState.value = NewsFeedScreenState.Posts(posts = repository.feedPosts)
+        }
     }
 }

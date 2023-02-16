@@ -7,4 +7,6 @@
     <string name="navigation_item_home">Главная</string>
     <string name="navigation_item_favorite">Избранное</string>
     <string name="navigation_item_profile">Профиль</string>
+
+    <string name="comments_title">Комментарии</string>
 </resources>
